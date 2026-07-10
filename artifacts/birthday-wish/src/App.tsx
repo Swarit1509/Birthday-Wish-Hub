@@ -56,7 +56,7 @@ function CalendarWidget() {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1.2, ease: "easeOut" }}
-      className="relative flex flex-col items-center justify-center w-48 h-56 mx-auto bg-card/80 backdrop-blur-md border border-card-border rounded-3xl shadow-2xl overflow-hidden z-10"
+      className="relative flex flex-col items-center justify-center w-72 h-80 mx-auto bg-card/80 backdrop-blur-md border border-card-border rounded-3xl shadow-2xl overflow-hidden z-10"
     >
       <motion.div 
         animate={{ opacity: [0.4, 0.8, 0.4] }}
@@ -73,11 +73,11 @@ function CalendarWidget() {
             textShadow: ['0 0 0px rgba(0,0,0,0)', '0 0 20px hsl(var(--primary)/0.5)', '0 0 0px rgba(0,0,0,0)']
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="text-7xl font-serif font-bold leading-none mt-2 relative z-10"
+          className="text-9xl font-serif font-bold leading-none mt-2 relative z-10"
         >
           7
         </motion.div>
-        <div className="text-muted-foreground font-sans mt-3 tracking-[0.3em] text-sm">
+        <div className="text-muted-foreground font-sans mt-3 tracking-[0.3em] text-lg">
           2026
         </div>
       </div>
