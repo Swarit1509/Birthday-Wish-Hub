@@ -51,79 +51,57 @@ function Particles() {
 }
 
 function CalendarWidget() {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2, ease: "easeOut" }}
-      className="relative flex flex-col items-center justify-center w-72 h-80 mx-auto bg-card/80 backdrop-blur-md border border-card-border rounded-3xl shadow-2xl overflow-hidden z-10"
-    >
-      <motion.div 
-        animate={{ opacity: [0.4, 0.8, 0.4] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none"
-      />
-      <div className="w-full bg-primary/15 text-primary text-center py-3 text-4xl border-b border-primary/20" style={{ fontFamily: "'Great Vibes', cursive" }}>
-        November
-      </div>
-      <div className="flex-1 flex flex-col items-center justify-center pt-2 relative">
-        <motion.div 
-          animate={{ 
-            color: ['hsl(var(--foreground))', 'hsl(var(--primary))', 'hsl(var(--foreground))'],
-            textShadow: ['0 0 0px rgba(0,0,0,0)', '0 0 20px hsl(var(--primary)/0.5)', '0 0 0px rgba(0,0,0,0)']
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="text-9xl font-serif font-bold leading-none mt-2 relative z-10"
-        >
-          7
-        </motion.div>
-        <div className="text-muted-foreground font-sans mt-3 tracking-[0.3em] text-lg">
-          2026
-        </div>
-      </div>
-      
-      {/* Hand-drawn style circle highlight effect */}
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 mt-6"
-      >
-        <svg width="140" height="140" viewBox="0 0 100 100" className="overflow-visible">
-          <motion.path
-            d="M 50, 20 C 80, 15 95, 40 85, 65 C 75, 90 35, 95 15, 75 C -5, 55 5, 25 25, 15 C 35, 10 50, 15 55, 18"
-            fill="transparent"
-            stroke="hsl(var(--primary))"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.8 }}
-            transition={{ duration: 2, delay: 1.5, ease: "easeInOut" }}
-          />
-        </svg>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function CakeSection() {
   const cakeUrl = `${import.meta.env.BASE_URL}cake.png`.replace('//', '/');
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
-      className="relative flex justify-center items-center mt-16 mb-12 z-10"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+      className="relative flex flex-row w-[780px] max-w-[95vw] h-72 mx-auto bg-card/80 backdrop-blur-md border border-card-border rounded-3xl shadow-2xl overflow-hidden z-10"
     >
-      <div className="relative">
-        <motion.div 
-          animate={{ opacity: [0.4, 0.7, 0.4], scale: [0.95, 1.05, 0.95] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 bg-primary/40 rounded-full blur-[50px] pointer-events-none"
+      {/* Ambient glow overlay */}
+      <motion.div
+        animate={{ opacity: [0.4, 0.8, 0.4] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none z-0"
+      />
+
+      {/* LEFT — cake image */}
+      <div className="relative w-72 shrink-0 h-full overflow-hidden">
+        <img
+          src={cakeUrl}
+          alt="Birthday Cake"
+          className="w-full h-full object-cover"
         />
-        <div className="relative z-10 p-2 rounded-full border border-primary/20 bg-card/30 backdrop-blur-sm shadow-[0_0_60px_rgba(200,100,100,0.15)]">
-          <img 
-            src={cakeUrl}
-            alt="Birthday Cake" 
-            className="w-64 h-64 md:w-80 md:h-80 object-cover rounded-full shadow-inner"
-          />
+        {/* soft fade into the right panel */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-card/80" />
+      </div>
+
+      {/* RIGHT — date info */}
+      <div className="relative flex-1 flex flex-col z-10">
+        {/* Month header */}
+        <div
+          className="w-full bg-primary/15 text-primary text-center py-3 text-5xl border-b border-primary/20"
+          style={{ fontFamily: "'Great Vibes', cursive" }}
+        >
+          November
+        </div>
+
+        {/* Day + Year */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-1">
+          <motion.div
+            animate={{
+              color: ['hsl(var(--foreground))', 'hsl(var(--primary))', 'hsl(var(--foreground))'],
+              textShadow: ['0 0 0px rgba(0,0,0,0)', '0 0 24px hsl(var(--primary)/0.6)', '0 0 0px rgba(0,0,0,0)'],
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="text-[9rem] font-serif font-bold leading-none relative z-10"
+          >
+            7
+          </motion.div>
+          <div className="text-muted-foreground font-sans tracking-[0.35em] text-xl">
+            2026
+          </div>
         </div>
       </div>
     </motion.div>
@@ -164,7 +142,6 @@ function BirthdayPage() {
       
       <div className="relative w-full max-w-5xl mx-auto flex flex-col items-center z-10">
         <CalendarWidget />
-        <CakeSection />
         <WishText />
       </div>
     </div>
