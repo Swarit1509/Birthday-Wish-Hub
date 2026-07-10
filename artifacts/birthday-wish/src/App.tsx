@@ -63,7 +63,7 @@ function CalendarWidget() {
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none"
       />
-      <div className="w-full bg-primary/15 text-primary font-sans text-center py-2.5 text-xs font-semibold tracking-[0.2em] uppercase border-b border-primary/20">
+      <div className="w-full bg-primary/15 text-primary text-center py-3 text-4xl border-b border-primary/20" style={{ fontFamily: "'Great Vibes', cursive" }}>
         November
       </div>
       <div className="flex-1 flex flex-col items-center justify-center pt-2 relative">
