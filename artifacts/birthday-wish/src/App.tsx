@@ -113,17 +113,21 @@ function WishText() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2, delay: 0.8, ease: "easeOut" }}
-      className="text-center px-6 space-y-6 max-w-3xl mx-auto z-10 relative"
+      transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+      className="text-center px-6 space-y-6 max-w-3xl mx-auto z-10 relative mt-16"
     >
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-foreground leading-[1.2] md:leading-[1.2]">
+      <h2
+        className="text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.3]"
+        style={{ fontFamily: "'Pinyon Script', cursive" }}
+      >
         happpiessttt birthdayyyyyy gouriiiiiiiiii yayyyyyyyyyyyyyyyyy
       </h2>
-      <motion.p 
+      <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.4 }}
-        className="text-xl md:text-2xl text-primary font-serif italic tracking-wide"
+        className="text-2xl md:text-3xl text-primary tracking-wide"
+        style={{ fontFamily: "'Dancing Script', cursive", fontWeight: 600 }}
       >
         Happy Birthday! May all your dreams come true 🎂
       </motion.p>
