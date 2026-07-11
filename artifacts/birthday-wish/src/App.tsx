@@ -117,7 +117,7 @@ function WishText() {
       className="text-center px-6 space-y-6 max-w-3xl mx-auto z-10 relative"
     >
       <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-foreground leading-[1.2] md:leading-[1.2]">
-        Wishing you a day as wonderful as you are
+        happpiessttt birthdayyyyyy gouriiiiiiiiii yayyyyyyyyyyyyyyyyy
       </h2>
       <motion.p 
         initial={{ opacity: 0 }}
