@@ -118,7 +118,7 @@ function WishText() {
     >
       <h2
         className="text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.3]"
-        style={{ fontFamily: "'Pacifico', cursive" }}
+        style={{ fontFamily: "'Cinzel Decorative', 'Algerian', serif", textTransform: 'capitalize' }}
       >
         happpiessttt birthdayyyyyy gouriiiiiiiiii yayyyyyyyyyyyyyyyyy
       </h2>
@@ -127,7 +127,7 @@ function WishText() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.4 }}
         className="text-2xl md:text-3xl text-primary tracking-wide"
-        style={{ fontFamily: "'Courgette', cursive" }}
+        style={{ fontFamily: "'Cinzel', 'Algerian', serif", textTransform: 'capitalize' }}
       >
         Happy Birthday! May all your dreams come true 🎂
       </motion.p>
