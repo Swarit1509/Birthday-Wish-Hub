@@ -4,6 +4,16 @@ import { useEffect, useState } from 'react';
 
 const queryClient = new QueryClient();
 
+function NeonWords({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
+  return (
+    <span className={className} style={style}>
+      {text.split(' ').map((word, i) => (
+        <span key={i} className="neon-word">{word}</span>
+      )).reduce<React.ReactNode[]>((acc, el, i) => i === 0 ? [el] : [...acc, ' ', el], [])}
+    </span>
+  );
+}
+
 function Particles() {
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; destX: number; size: number; duration: number; delay: number }>>([]);
 
@@ -81,10 +91,10 @@ function CalendarWidget() {
       <div className="relative flex-1 flex flex-col z-10">
         {/* Month header */}
         <div
-          className="w-full bg-primary/15 text-primary text-center py-3 text-5xl border-b border-primary/20 neon-hover cursor-default"
+          className="w-full bg-primary/15 text-primary text-center py-3 text-5xl border-b border-primary/20"
           style={{ fontFamily: "'Great Vibes', cursive" }}
         >
-          November
+          <span className="neon-word">November</span>
         </div>
 
         {/* Day + Year */}
@@ -116,20 +126,22 @@ function WishText() {
       transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
       className="text-center px-6 space-y-6 max-w-3xl mx-auto z-10 relative mt-16"
     >
-      <h2
-        className="text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.3] neon-hover cursor-default"
-        style={{ fontFamily: "'Cinzel Decorative', 'Algerian', serif", textTransform: 'capitalize' }}
-      >
-        happpiessttt birthdayyyyyy gouriiiiiiiiii yayyyyyyyyyyyyyyyyy
+      <h2 className="text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.3]">
+        <NeonWords
+          text="happpiessttt birthdayyyyyy gouriiiiiiiiii yayyyyyyyyyyyyyyyyy"
+          style={{ fontFamily: "'Cinzel Decorative', 'Algerian', serif", textTransform: 'capitalize' }}
+        />
       </h2>
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.4 }}
-        className="text-2xl md:text-3xl text-primary tracking-wide neon-hover cursor-default"
-        style={{ fontFamily: "'Cinzel', 'Algerian', serif", textTransform: 'capitalize' }}
+        className="text-2xl md:text-3xl text-primary tracking-wide"
       >
-        Happy Birthday! May all your dreams come true 🎂
+        <NeonWords
+          text="Happy Birthday! May all your dreams come true 🎂"
+          style={{ fontFamily: "'Cinzel', 'Algerian', serif", textTransform: 'capitalize' }}
+        />
       </motion.p>
     </motion.div>
   );

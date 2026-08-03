@@ -331,18 +331,20 @@
     inset: -1px;
   }
 
-  .neon-hover {
-    transition: text-shadow 0.3s ease, color 0.3s ease;
+  .neon-word {
+    display: inline-block;
+    transition: text-shadow 0.25s ease, color 0.25s ease;
+    cursor: default;
   }
 
-  .neon-hover:hover {
-    color: #fff !important;
+  .neon-word:hover {
+    color: #e0f7ff !important;
     text-shadow:
-      0 0 6px #fff,
-      0 0 12px #fff,
-      0 0 25px hsl(330 100% 75%),
-      0 0 50px hsl(330 100% 65%),
-      0 0 90px hsl(330 100% 55%),
-      0 0 130px hsl(330 100% 50%);
+      0 0 4px #fff,
+      0 0 10px #00e5ff,
+      0 0 22px #00cfff,
+      0 0 45px #00b4d8,
+      0 0 80px #0096c7,
+      0 0 110px #0077b6;
   }
 }
