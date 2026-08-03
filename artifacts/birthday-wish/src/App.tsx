@@ -81,7 +81,7 @@ function CalendarWidget() {
       <div className="relative flex-1 flex flex-col z-10">
         {/* Month header */}
         <div
-          className="w-full bg-primary/15 text-primary text-center py-3 text-5xl border-b border-primary/20"
+          className="w-full bg-primary/15 text-primary text-center py-3 text-5xl border-b border-primary/20 neon-hover cursor-default"
           style={{ fontFamily: "'Great Vibes', cursive" }}
         >
           November
@@ -117,7 +117,7 @@ function WishText() {
       className="text-center px-6 space-y-6 max-w-3xl mx-auto z-10 relative mt-16"
     >
       <h2
-        className="text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.3]"
+        className="text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.3] neon-hover cursor-default"
         style={{ fontFamily: "'Cinzel Decorative', 'Algerian', serif", textTransform: 'capitalize' }}
       >
         happpiessttt birthdayyyyyy gouriiiiiiiiii yayyyyyyyyyyyyyyyyy
@@ -126,7 +126,7 @@ function WishText() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.4 }}
-        className="text-2xl md:text-3xl text-primary tracking-wide"
+        className="text-2xl md:text-3xl text-primary tracking-wide neon-hover cursor-default"
         style={{ fontFamily: "'Cinzel', 'Algerian', serif", textTransform: 'capitalize' }}
       >
         Happy Birthday! May all your dreams come true 🎂
