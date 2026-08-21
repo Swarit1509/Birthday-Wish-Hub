@@ -1,0 +1,9 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "Vawkis_jWm_VBn_HhwArl"
+uri = "file://artifacts/birthday-wish/whole-birthday-wish-code.txt"
+type = "text"
+title = "Birthday Wish Website - Complete Code"
+description = "A single text file containing the complete React source, styling, HTML, package configuration, TypeScript configuration, Vite configuration, and an asset note."

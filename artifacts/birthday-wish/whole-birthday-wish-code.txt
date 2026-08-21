@@ -1,0 +1,955 @@
+
+
+============================================================
+FILE: src/App.tsx
+============================================================
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+
+const queryClient = new QueryClient();
+
+// ── font constants ────────────────────────────────────────────────────────────
+const CINZEL     = "'Cinzel Decorative', 'Algerian', serif";
+const CINZEL_SM  = "'Cinzel', 'Algerian', serif";
+const LUCIDA     = "'Lucida Calligraphy', 'Great Vibes', cursive";
+
+// ── NeonWords helper ──────────────────────────────────────────────────────────
+function NeonWords({ text, style }: { text: string; style?: React.CSSProperties }) {
+  return (
+    <span style={style}>
+      {text.split(' ').map((word, i) => (
+        <span key={i} className="neon-word">{word}</span>
+      )).reduce<React.ReactNode[]>((acc, el, i) => i === 0 ? [el] : [...acc, ' ', el], [])}
+    </span>
+  );
+}
+
+// ── background cake ───────────────────────────────────────────────────────────
+function BackgroundCake() {
+  const cakeUrl = `${import.meta.env.BASE_URL}cake.png`.replace('//', '/');
+  return (
+    <div className="fixed inset-0 z-0 pointer-events-none">
+      <img
+        src={cakeUrl}
+        alt=""
+        className="w-full h-full object-cover"
+        style={{ opacity: 0.38, filter: 'saturate(1.3)' }}
+      />
+      <div className="absolute inset-0 bg-background/45" />
+    </div>
+  );
+}
+
+// ── balloons ──────────────────────────────────────────────────────────────────
+const BALLOON_COLORS = [
+  '#FF4444','#FF8C00','#FFD700','#7FFF00','#00E5FF',
+  '#4169E1','#9400D3','#FF69B4','#FF00FF','#00CED1',
+];
+
+function Balloon({ color, x, size, duration, delay, sway }:
+  { color: string; x: number; size: number; duration: number; delay: number; sway: number }) {
+  const h = size * 1.25;
+  const sl = size * 1.6;
+  return (
+    <motion.div
+      className="absolute pointer-events-none"
+      style={{ left: `${x}%`, bottom: -size * 3 }}
+      initial={{ y: 0, opacity: 0 }}
+      animate={{ y: [0, -(1200 + size * 4)], x: [0, sway, -sway, sway / 2, 0], opacity: [0, 1, 1, 0.8, 0] }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'linear', times: [0, 0.05, 0.85, 0.95, 1] }}
+    >
+      <svg width={size} height={h + sl} viewBox={`0 0 ${size} ${h + sl}`}>
+        <ellipse cx={size/2} cy={h/2} rx={size/2} ry={h/2} fill={color} opacity={0.9}/>
+        <ellipse cx={size*0.36} cy={h*0.28} rx={size*0.13} ry={h*0.1} fill="white" opacity={0.38}/>
+        <circle cx={size/2} cy={h} r={size*0.055} fill={color}/>
+        <path d={`M ${size/2} ${h+size*0.06} Q ${size*0.35} ${h+sl*0.5} ${size/2} ${h+sl}`}
+          stroke={color} strokeWidth={1.5} fill="none" opacity={0.6}/>
+      </svg>
+    </motion.div>
+  );
+}
+
+function Balloons() {
+  const [items, setItems] = useState<{color:string;x:number;size:number;duration:number;delay:number;sway:number}[]>([]);
+  useEffect(() => {
+    setItems(BALLOON_COLORS.map((color, i) => ({
+      color, x: 5 + i * 9.5 + (Math.random()*5-2.5),
+      size: 44 + Math.random()*30,
+      duration: 12 + Math.random()*10,
+      delay: Math.random()*8,
+      sway: 20 + Math.random()*30,
+    })));
+  }, []);
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{zIndex:1}}>
+      {items.map((b,i) => <Balloon key={i} {...b}/>)}
+    </div>
+  );
+}
+
+// ── particles ─────────────────────────────────────────────────────────────────
+function Particles() {
+  const [ps, setPs] = useState<{id:number;x:number;dx:number;size:number;dur:number;del:number}[]>([]);
+  useEffect(() => {
+    setPs(Array.from({length:30},(_,i)=>({
+      id:i, x:Math.random()*100, dx:Math.random()*100,
+      size:Math.random()*5+2, dur:Math.random()*10+15, del:Math.random()*5,
+    })));
+  },[]);
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {ps.map(p=>(
+        <motion.div key={p.id} className="absolute rounded-full bg-primary/40"
+          style={{width:p.size,height:p.size,left:`${p.x}%`,boxShadow:'0 0 10px rgba(255,180,160,.5)'}}
+          initial={{y:'110vh',opacity:0}}
+          animate={{y:'-10vh',x:p.dx-p.x,opacity:[0,0.7,0]}}
+          transition={{duration:p.dur,delay:p.del,repeat:Infinity,ease:'linear'}}/>
+      ))}
+    </div>
+  );
+}
+
+// ── calendar widget ───────────────────────────────────────────────────────────
+function CalendarWidget() {
+  const cakeUrl = `${import.meta.env.BASE_URL}cake.png`.replace('//', '/');
+  return (
+    <motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}}
+      transition={{duration:1.2,ease:'easeOut'}}
+      className="relative flex flex-row w-[780px] max-w-[95vw] h-72 mx-auto bg-card/80 backdrop-blur-md border border-card-border rounded-3xl shadow-2xl overflow-hidden z-10">
+      <motion.div animate={{opacity:[0.4,0.8,0.4]}} transition={{duration:4,repeat:Infinity,ease:'easeInOut'}}
+        className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none"/>
+      <div className="relative w-72 shrink-0 h-full overflow-hidden">
+        <img src={cakeUrl} alt="" className="w-full h-full object-cover"/>
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-card/80"/>
+      </div>
+      <div className="relative flex-1 flex flex-col z-10">
+        <div className="w-full bg-primary/15 text-primary text-center py-3 text-5xl border-b border-primary/20"
+          style={{fontFamily:"'Great Vibes', cursive"}}>
+          <span className="neon-word">November</span>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-1">
+          <motion.div
+            animate={{color:['hsl(var(--foreground))','hsl(var(--primary))','hsl(var(--foreground))'],
+              textShadow:['0 0 0px rgba(0,0,0,0)','0 0 24px hsl(var(--primary)/.6)','0 0 0px rgba(0,0,0,0)']}}
+            transition={{duration:4,repeat:Infinity,ease:'easeInOut'}}
+            className="text-[9rem] font-serif font-bold leading-none">7</motion.div>
+          <div className="text-muted-foreground font-sans tracking-[0.35em] text-xl">2026</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── wish text ─────────────────────────────────────────────────────────────────
+function WishText() {
+  return (
+    <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}}
+      transition={{duration:1.2,delay:0.3,ease:'easeOut'}}
+      className="text-center px-6 space-y-6 max-w-3xl mx-auto z-10 relative mt-16">
+      <h2 className="text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.3]">
+        {['happpiessttt','birthdayyyyyy'].map((w,i)=>(
+          <span key={i}><span className="neon-word" style={{fontFamily:CINZEL,textTransform:'capitalize'}}>{w}</span>{' '}</span>
+        ))}
+        {/* full Gouri word in Lucida Calligraphy */}
+        <span className="neon-word" style={{fontFamily:LUCIDA,fontSize:'1.05em'}}>Gouriiiiiiiiii</span>
+        {' '}
+        <span className="neon-word" style={{fontFamily:CINZEL,textTransform:'capitalize'}}>yayyyyyyyyyyyyyyyyy</span>
+      </h2>
+      <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{duration:1,delay:1.4}}
+        className="text-2xl md:text-3xl text-primary tracking-wide">
+        <NeonWords text="Happy Birthday! May all your dreams come true 🎂" style={{fontFamily:CINZEL_SM,textTransform:'capitalize'}}/>
+      </motion.p>
+    </motion.div>
+  );
+}
+
+// ── glass-break option ────────────────────────────────────────────────────────
+const SHARDS = [
+  { x: -60,  y: 220, rotate: -35, scale: 0.6, clip: 'polygon(0 0,55% 0,40% 100%,0 70%)' },
+  { x:  10,  y: 260, rotate:  12, scale: 0.55,clip: 'polygon(30% 0,80% 0,100% 100%,20% 90%)' },
+  { x: -20,  y: 300, rotate: -20, scale: 0.5, clip: 'polygon(10% 0,60% 10%,50% 100%,0 80%)' },
+  { x:  50,  y: 240, rotate:  28, scale: 0.65,clip: 'polygon(40% 0,100% 20%,80% 100%,30% 90%)' },
+  { x: -80,  y: 280, rotate: -50, scale: 0.45,clip: 'polygon(0 20%,50% 0,60% 100%,0 100%)' },
+];
+
+function GlassBreakOption({ label, onClick, broken }: { label: string; onClick: ()=>void; broken: boolean }) {
+  return (
+    <div className="relative flex justify-center" style={{height:64}}>
+      <AnimatePresence>
+        {!broken && (
+          <motion.button
+            key="btn"
+            initial={{opacity:1,y:0}}
+            exit={{opacity:0,transition:{duration:0.05}}}
+            whileHover={{scale:1.04}}
+            onClick={onClick}
+            className="absolute px-10 py-3 rounded-xl border-2 border-primary/60 bg-white/10 backdrop-blur-sm text-foreground text-xl font-semibold tracking-wide"
+            style={{fontFamily:CINZEL_SM,minWidth:220}}
+          >{label}</motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* shards */}
+      <AnimatePresence>
+        {broken && SHARDS.map((s,i)=>(
+          <motion.div key={i}
+            className="absolute px-10 py-3 rounded-xl border-2 border-primary/60 bg-white/10 backdrop-blur-sm text-foreground text-xl font-semibold tracking-wide overflow-hidden pointer-events-none"
+            style={{fontFamily:CINZEL_SM,minWidth:220,clipPath:s.clip,top:0}}
+            initial={{x:0,y:0,rotate:0,opacity:1}}
+            animate={{x:s.x,y:s.y,rotate:s.rotate,scale:s.scale,opacity:0}}
+            transition={{duration:0.9,ease:[0.2,0,1,1],delay:i*0.04}}
+          >{label}</motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── quiz page ─────────────────────────────────────────────────────────────────
+const QUIZ_OPTIONS = ['9 Nov','7 Nov','15 Nov','10 Nov'];
+const CORRECT = '7 Nov';
+
+function QuizPage({ onCorrect }: { onCorrect: ()=>void }) {
+  const [broken, setBroken] = useState<string|null>(null);
+
+  function handleOption(opt: string) {
+    if (opt === CORRECT) { onCorrect(); return; }
+    setBroken(opt);
+    setTimeout(()=>setBroken(null), 1200);
+  }
+
+  return (
+    <motion.div
+      key="quiz"
+      initial={{opacity:0,y:60}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-40}}
+      transition={{duration:0.7,ease:'easeOut'}}
+      className="min-h-[100dvh] w-full flex flex-col items-center justify-center relative z-10 px-6 gap-12">
+      <motion.h2
+        initial={{opacity:0,scale:0.9}} animate={{opacity:1,scale:1}} transition={{delay:0.3,duration:0.6}}
+        className="text-4xl md:text-5xl text-foreground text-center leading-[1.4]"
+        style={{fontFamily:CINZEL}}>
+        Which day is today?
+      </motion.h2>
+
+      <div className="flex flex-col gap-6 w-full max-w-sm">
+        {QUIZ_OPTIONS.map((opt,i)=>(
+          <motion.div key={opt} initial={{opacity:0,x:-30}} animate={{opacity:1,x:0}}
+            transition={{delay:0.5+i*0.1,duration:0.5}}>
+            <GlassBreakOption
+              label={opt}
+              broken={broken===opt}
+              onClick={()=>handleOption(opt)}
+            />
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── next / congrats page ──────────────────────────────────────────────────────
+function CongratsPage() {
+  const cakeUrl = `${import.meta.env.BASE_URL}cake.png`.replace('//', '/');
+  return (
+    <motion.div
+      key="congrats"
+      initial={{opacity:0,scale:0.92}} animate={{opacity:1,scale:1}} exit={{opacity:0}}
+      transition={{duration:0.8,ease:'easeOut'}}
+      className="min-h-[100dvh] w-full flex flex-col items-center justify-center relative z-10 px-6 gap-10 text-center">
+      <motion.div
+        initial={{scale:0,rotate:-20}} animate={{scale:1,rotate:0}}
+        transition={{type:'spring',stiffness:200,damping:14,delay:0.2}}
+        className="w-52 h-52 rounded-full overflow-hidden border-4 border-primary shadow-[0_0_60px_rgba(255,180,255,0.6)]">
+        <img src={cakeUrl} alt="cake" className="w-full h-full object-cover"/>
+      </motion.div>
+
+      <motion.h1 initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{delay:0.5}}
+        className="text-5xl md:text-6xl text-foreground leading-[1.3]"
+        style={{fontFamily:LUCIDA}}>
+        🎉 That's right! It's your day! 🎉
+      </motion.h1>
+
+      <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.9}}
+        className="text-2xl text-primary"
+        style={{fontFamily:CINZEL_SM}}>
+        <span className="neon-word">Happy Birthday Gouri!</span>
+      </motion.p>
+    </motion.div>
+  );
+}
+
+// ── main birthday page ────────────────────────────────────────────────────────
+function MainPage({ onEnter }: { onEnter: ()=>void }) {
+  return (
+    <motion.div key="main" initial={{opacity:1}} exit={{opacity:0,y:-40}} transition={{duration:0.5}}
+      className="w-full flex flex-col items-center py-20 pb-32">
+      <div className="relative w-full max-w-5xl mx-auto flex flex-col items-center z-10">
+        <CalendarWidget/>
+        <WishText/>
+
+        {/* Enter Here button */}
+        <motion.div className="mt-24 flex flex-col items-center gap-3 z-10"
+          initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{delay:1.8,duration:0.8}}>
+          <p className="text-primary/70 text-sm tracking-widest uppercase" style={{fontFamily:CINZEL_SM}}>
+            scroll down
+          </p>
+          <motion.div animate={{y:[0,8,0]}} transition={{repeat:Infinity,duration:1.4,ease:'easeInOut'}}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth="2" className="text-primary/60">
+              <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+          </motion.div>
+          <motion.button
+            onClick={onEnter}
+            whileHover={{scale:1.06, boxShadow:'0 0 30px rgba(0,200,255,0.5)'}}
+            whileTap={{scale:0.97}}
+            className="mt-4 px-12 py-4 rounded-2xl text-2xl font-bold tracking-wide text-white border-2 border-primary/60 bg-primary/20 backdrop-blur-sm"
+            style={{fontFamily:CINZEL,
+              textShadow:'0 0 12px rgba(0,220,255,0.8)',
+              boxShadow:'0 0 20px rgba(0,200,255,0.3)'}}>
+            Enter Here
+          </motion.button>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── birthday page shell ───────────────────────────────────────────────────────
+type Page = 'main'|'quiz'|'congrats';
+
+function BirthdayPage() {
+  const [page, setPage] = useState<Page>('main');
+
+  return (
+    <div className="min-h-[100dvh] w-full bg-background relative overflow-x-hidden selection:bg-primary/30">
+      <BackgroundCake/>
+      <Balloons/>
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{zIndex:2}}>
+        <Particles/>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/10 rounded-full blur-[120px]"/>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {page==='main'    && <MainPage    key="main"    onEnter={()=>setPage('quiz')}/>}
+        {page==='quiz'    && <QuizPage    key="quiz"    onCorrect={()=>setPage('congrats')}/>}
+        {page==='congrats'&& <CongratsPage key="congrats"/>}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── app ───────────────────────────────────────────────────────────────────────
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BirthdayPage/>
+    </QueryClientProvider>
+  );
+}
+
+
+============================================================
+FILE: src/index.css
+============================================================
+
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-primary-border: var(--sidebar-primary-border);
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-accent-border: var(--sidebar-accent-border);
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* LIGHT MODE */
+:root {
+  --button-outline: rgba(0, 0, 0, 0.1);
+  --badge-outline: rgba(0, 0, 0, 0.05);
+
+  --opaque-button-border-intensity: -8; 
+  --elevate-1: rgba(0, 0, 0, 0.03);
+  --elevate-2: rgba(0, 0, 0, 0.08);
+
+  --background: 330 80% 30%;
+  --foreground: 0 0% 100%;
+  --border: 330 70% 55%;
+  --card: 330 78% 38%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 330 72% 55%;
+
+  --sidebar: 330 82% 24%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 330 70% 50%;
+  --sidebar-primary: 330 100% 88%;
+  --sidebar-primary-foreground: 330 80% 30%;
+  --sidebar-accent: 330 72% 44%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 330 100% 88%;
+
+  --popover: 330 78% 38%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 330 72% 55%;
+
+  --primary: 330 100% 88%;
+  --primary-foreground: 330 80% 30%;
+
+  --secondary: 330 72% 44%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 330 70% 40%;
+  --muted-foreground: 330 40% 90%;
+
+  --accent: 330 75% 48%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 330 70% 52%;
+  --ring: 330 100% 88%;
+  
+  --chart-1: 330 100% 88%;
+  --chart-2: 310 80% 75%;
+  --chart-3: 350 90% 85%;
+  --chart-4: 330 75% 55%;
+  --chart-5: 310 90% 80%;
+
+  --app-font-sans: 'Outfit', sans-serif;
+  --app-font-serif: 'Playfair Display', serif;
+  --app-font-mono: 'Space Mono', monospace;
+  
+  --radius: 1rem;
+  
+  --shadow-2xs: 0px 2px 0px 0px hsl(345 50% 10% / 0.5);
+  --shadow-xs: 0px 2px 0px 0px hsl(345 50% 10% / 0.5);
+  --shadow-sm:
+    0px 2px 0px 0px hsl(345 50% 10% / 0.5),
+    0px 1px 2px -1px hsl(345 50% 10% / 0.5);
+  --shadow:
+    0px 2px 0px 0px hsl(345 50% 10% / 0.5),
+    0px 1px 2px -1px hsl(345 50% 10% / 0.5);
+  --shadow-md:
+    0px 2px 0px 0px hsl(345 50% 10% / 0.5),
+    0px 2px 4px -1px hsl(345 50% 10% / 0.5);
+  --shadow-lg:
+    0px 2px 0px 0px hsl(345 50% 10% / 0.5),
+    0px 4px 6px -1px hsl(345 50% 10% / 0.5);
+  --shadow-xl:
+    0px 2px 0px 0px hsl(345 50% 10% / 0.5),
+    0px 8px 10px -1px hsl(345 50% 10% / 0.5);
+  --shadow-2xl: 0px 2px 0px 0px hsl(345 50% 10% / 0.5);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+
+  --sidebar-primary-border: hsl(
+    from hsl(var(--sidebar-primary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+
+  --sidebar-accent-border: hsl(
+    from hsl(var(--sidebar-accent)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+
+  --primary-border: hsl(
+    from hsl(var(--primary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+
+  --secondary-border: hsl(
+    from hsl(var(--secondary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+
+  --muted-border: hsl(
+    from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
+
+  --accent-border: hsl(
+    from hsl(var(--accent)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+
+  --destructive-border: hsl(
+    from hsl(var(--destructive)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+}
+
+.dark {
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --badge-outline: rgba(255, 255, 255, 0.05);
+
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
+
+  --background: 330 80% 30%;
+  --foreground: 0 0% 100%;
+  --border: 330 70% 55%;
+  --card: 330 78% 38%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 330 72% 55%;
+
+  --sidebar: 330 82% 24%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 330 70% 50%;
+  --sidebar-primary: 330 100% 88%;
+  --sidebar-primary-foreground: 330 80% 30%;
+  --sidebar-accent: 330 72% 44%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 330 100% 88%;
+
+  --popover: 330 78% 38%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 330 72% 55%;
+
+  --primary: 330 100% 88%;
+  --primary-foreground: 330 80% 30%;
+
+  --secondary: 330 72% 44%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 330 70% 40%;
+  --muted-foreground: 330 40% 90%;
+
+  --accent: 330 75% 48%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 330 70% 52%;
+  --ring: 330 100% 88%;
+  
+  --chart-1: 330 100% 88%;
+  --chart-2: 310 80% 75%;
+  --chart-3: 350 90% 85%;
+  --chart-4: 330 75% 55%;
+  --chart-5: 310 90% 80%;
+
+  --shadow-2xs: 0px 2px 0px 0px hsl(330 55% 8% / 0.5);
+  --shadow-xs: 0px 2px 0px 0px hsl(330 55% 8% / 0.5);
+  --shadow-sm:
+    0px 2px 0px 0px hsl(330 55% 8% / 0.5),
+    0px 1px 2px -1px hsl(330 55% 8% / 0.5);
+  --shadow:
+    0px 2px 0px 0px hsl(330 55% 8% / 0.5),
+    0px 1px 2px -1px hsl(330 55% 8% / 0.5);
+  --shadow-md:
+    0px 2px 0px 0px hsl(330 55% 8% / 0.5),
+    0px 2px 4px -1px hsl(330 55% 8% / 0.5);
+  --shadow-lg:
+    0px 2px 0px 0px hsl(330 55% 8% / 0.5),
+    0px 4px 6px -1px hsl(330 55% 8% / 0.5);
+  --shadow-xl:
+    0px 2px 0px 0px hsl(330 55% 8% / 0.5),
+    0px 8px 10px -1px hsl(330 55% 8% / 0.5);
+  --shadow-2xl: 0px 2px 0px 0px hsl(330 55% 8% / 0.5);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  input[type='search']::-webkit-search-cancel-button {
+    @apply hidden;
+  }
+
+  [contenteditable][data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+  }
+
+  .toggle-elevate::before,
+  .toggle-elevate-2::before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .toggle-elevate.toggle-elevated::before {
+    background-color: var(--elevate-2);
+  }
+
+  .border.toggle-elevate::before {
+    inset: -1px;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate),
+  .active-elevate:not(.no-default-active-elevate),
+  .hover-elevate-2:not(.no-default-hover-elevate),
+  .active-elevate-2:not(.no-default-active-elevate) {
+    position: relative;
+    z-index: 0;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate)::after,
+  .active-elevate:not(.no-default-active-elevate)::after,
+  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:not(.no-default-active-elevate)::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+  }
+
+  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-1);
+  }
+
+  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-2);
+  }
+
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate-2:not(.no-active-interaction-elevate)::after {
+    inset: -1px;
+  }
+
+  .neon-word {
+    display: inline-block;
+    transition: text-shadow 0.25s ease, color 0.25s ease;
+    cursor: default;
+  }
+
+  .neon-word:hover {
+    color: #e0f7ff !important;
+    text-shadow:
+      0 0 4px #fff,
+      0 0 10px #00e5ff,
+      0 0 22px #00cfff,
+      0 0 45px #00b4d8,
+      0 0 80px #0096c7,
+      0 0 110px #0077b6;
+  }
+}
+
+
+============================================================
+FILE: src/main.tsx
+============================================================
+
+import { createRoot } from 'react-dom/client';
+
+import App from './App';
+
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(<App />);
+
+
+============================================================
+FILE: index.html
+============================================================
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Birthday Wishing Website</title>
+    <meta name="description" content="Birthday Wishing Website — built on Replit. Update this description to reflect the app." />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Birthday Wishing Website" />
+    <meta property="og:description" content="Birthday Wishing Website — built on Replit. Update this description to reflect the app." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Birthday Wishing Website" />
+    <meta name="twitter:description" content="Birthday Wishing Website — built on Replit. Update this description to reflect the app." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+
+============================================================
+FILE: package.json
+============================================================
+
+{
+  "name": "@workspace/birthday-wish",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config vite.config.ts --host 0.0.0.0",
+    "build": "vite build --config vite.config.ts",
+    "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-accordion": "^1.2.4",
+    "@radix-ui/react-alert-dialog": "^1.1.7",
+    "@radix-ui/react-aspect-ratio": "^1.1.3",
+    "@radix-ui/react-avatar": "^1.1.4",
+    "@radix-ui/react-checkbox": "^1.1.5",
+    "@radix-ui/react-collapsible": "^1.1.4",
+    "@radix-ui/react-context-menu": "^2.2.7",
+    "@radix-ui/react-dialog": "^1.1.7",
+    "@radix-ui/react-dropdown-menu": "^2.1.7",
+    "@radix-ui/react-hover-card": "^1.1.7",
+    "@radix-ui/react-label": "^2.1.3",
+    "@radix-ui/react-menubar": "^1.1.7",
+    "@radix-ui/react-navigation-menu": "^1.2.6",
+    "@radix-ui/react-popover": "^1.1.7",
+    "@radix-ui/react-progress": "^1.1.3",
+    "@radix-ui/react-radio-group": "^1.2.4",
+    "@radix-ui/react-scroll-area": "^1.2.4",
+    "@radix-ui/react-select": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.3",
+    "@radix-ui/react-slider": "^1.2.4",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@radix-ui/react-switch": "^1.1.4",
+    "@radix-ui/react-tabs": "^1.1.4",
+    "@radix-ui/react-toast": "^1.2.7",
+    "@radix-ui/react-toggle": "^1.1.3",
+    "@radix-ui/react-toggle-group": "^1.1.3",
+    "@radix-ui/react-tooltip": "^1.2.0",
+    "@replit/vite-plugin-cartographer": "catalog:",
+    "@replit/vite-plugin-dev-banner": "catalog:",
+    "@replit/vite-plugin-runtime-error-modal": "catalog:",
+    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "@workspace/api-client-react": "workspace:*",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "cmdk": "^1.1.1",
+    "date-fns": "^3.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "catalog:",
+    "input-otp": "^1.4.2",
+    "lucide-react": "catalog:",
+    "next-themes": "^0.4.6",
+    "react": "catalog:",
+    "react-day-picker": "^9.11.1",
+    "react-dom": "catalog:",
+    "react-hook-form": "^7.55.0",
+    "react-icons": "^5.4.0",
+    "react-resizable-panels": "^2.1.7",
+    "recharts": "^2.15.2",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "catalog:",
+    "tailwindcss": "catalog:",
+    "tw-animate-css": "^1.4.0",
+    "vaul": "^1.1.2",
+    "vite": "catalog:",
+    "wouter": "^3.3.5",
+    "zod": "catalog:"
+  }
+}
+
+
+============================================================
+FILE: tsconfig.json
+============================================================
+
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "preserve",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler",
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "references": [
+    {
+      "path": "../../lib/api-client-react"
+    }
+  ]
+}
+
+
+============================================================
+FILE: vite.config.ts
+============================================================
+
+import path from 'path';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'vite';
+
+import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
+
+const rawPort = process.env.PORT;
+
+if (!rawPort) {
+  throw new Error(
+    'PORT environment variable is required but was not provided.',
+  );
+}
+
+const port = Number(rawPort);
+
+if (Number.isNaN(port) || port <= 0) {
+  throw new Error(`Invalid PORT value: "${rawPort}"`);
+}
+
+const basePath = process.env.BASE_PATH;
+
+if (!basePath) {
+  throw new Error(
+    'BASE_PATH environment variable is required but was not provided.',
+  );
+}
+
+export default defineConfig({
+  base: basePath,
+  plugins: [
+    react(),
+    tailwindcss(),
+    runtimeErrorOverlay(),
+    ...(process.env.NODE_ENV !== 'production' &&
+    process.env.REPL_ID !== undefined
+      ? [
+          await import('@replit/vite-plugin-cartographer').then((m) =>
+            m.cartographer({
+              root: path.resolve(import.meta.dirname, '..'),
+            }),
+          ),
+          await import('@replit/vite-plugin-dev-banner').then((m) =>
+            m.devBanner(),
+          ),
+        ]
+      : []),
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(import.meta.dirname, 'src'),
+      '@assets': path.resolve(
+        import.meta.dirname,
+        '..',
+        '..',
+        'attached_assets',
+      ),
+    },
+    dedupe: ['react', 'react-dom'],
+  },
+  root: path.resolve(import.meta.dirname),
+  build: {
+    outDir: path.resolve(import.meta.dirname, 'dist/public'),
+    emptyOutDir: true,
+  },
+  server: {
+    port,
+    strictPort: true,
+    host: '0.0.0.0',
+    allowedHosts: true,
+    fs: {
+      strict: true,
+    },
+  },
+  preview: {
+    port,
+    host: '0.0.0.0',
+    allowedHosts: true,
+  },
+});
+
+
+============================================================
+ASSET NOTE
+============================================================
+
+The project also uses public/cake.png, a binary image file, so it cannot be represented inside a plain text file.
