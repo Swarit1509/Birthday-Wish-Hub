@@ -153,7 +153,7 @@ function WishText() {
       </h2>
       <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{duration:1,delay:1.4}}
         className="text-2xl md:text-3xl text-primary tracking-wide">
-        <NeonWords text="Happy Birthday! May all your dreams come true 🎂" style={{fontFamily:CINZEL_SM,textTransform:'capitalize'}}/>
+        <NeonWords text="Happy Birthday yayyyy kitne dino se wait tha mujhee sccroolll krr nicheee" style={{fontFamily:CINZEL_SM,textTransform:'capitalize'}}/>
       </motion.p>
     </motion.div>
   );
