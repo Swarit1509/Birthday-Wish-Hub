@@ -262,7 +262,7 @@ function CongratsPage() {
       <motion.h1 initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{delay:0.5}}
         className="text-5xl md:text-6xl text-foreground leading-[1.3]"
         style={{fontFamily:LUCIDA}}>
-        Happiieesstttt Biirttthhdayyy to my sweetessttt Homegirl lysm you are the bestest frienddd and today is yourrr dayy i'm so happpyy yayyyyyy haappyyyy happpyyy birthhhdayyyy
+        Happiieesstttt Biirttthhdayyy to my sweetessttt Homegirl you are the bestest frienddd and today is yourrr dayy i'm so happpyy yayyyyyy haappyyyy happpyyy birthhhdayyyy
       </motion.h1>
 
       <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.9}}
