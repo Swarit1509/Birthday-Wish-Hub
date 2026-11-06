@@ -268,7 +268,7 @@ function CongratsPage() {
       <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.9}}
         className="text-2xl text-primary"
         style={{fontFamily:CINZEL_SM}}>
-        <span className="neon-word">Happy Birthday Gouri!</span>
+        <span className="neon-word">Happpyyy Happpyyy Birthday Gouriiiii yuuuhuuu yayyyyy !</span>
       </motion.p>
     </motion.div>
   );
