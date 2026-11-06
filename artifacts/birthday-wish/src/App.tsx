@@ -262,7 +262,7 @@ function CongratsPage() {
       <motion.h1 initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{delay:0.5}}
         className="text-5xl md:text-6xl text-foreground leading-[1.3]"
         style={{fontFamily:LUCIDA}}>
-        Happiieesstttt Biirttthhdayyy to my sweetessttt Homegirl you are the bestest frienddd and today is yourrr dayy i'm so happpyy yayyyyyy haappyyyy happpyyy birthhhdayyyy
+        Happiieesstttt Biirttthhdayyy gouriiiiiiiiiiii yayayayay many many happy returns of the day gourii , haapyy haappy birthdayyy, gift toh unbox kkr hi liya hai tunee wo hi ek surprise tha bss :) khair koi nhi krna toh tha hi open btw bata dena kaisa hai and and happyy happpyyy birthdayyyy yayyyyayayayya party and haa party dena mt bhulnaaa mujhe chahiye iss bar party tersee yayyyayya once againnn happpyyyy birthdayyyyyyyyy gouriiiiiiiii!!!!!!!!!!!
       </motion.h1>
 
       <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.9}}
